@@ -1,0 +1,52 @@
+[
+  {
+    "id": 1,
+    "name": "Player 1",
+    "position": "GK",
+    "number": 1,
+    "age": 28,
+    "nationality": "Spain",
+    "x": 50,
+    "y": 85
+  },
+  {
+    "id": 2,
+    "name": "Player 2",
+    "position": "RB",
+    "number": 2,
+    "age": 25,
+    "nationality": "Brazil",
+    "x": 80,
+    "y": 70
+  },
+  {
+    "id": 3,
+    "name": "Player 3",
+    "position": "CB",
+    "number": 3,
+    "age": 29,
+    "nationality": "France",
+    "x": 60,
+    "y": 70
+  },
+  {
+    "id": 4,
+    "name": "Player 4",
+    "position": "CB",
+    "number": 4,
+    "age": 21,
+    "nationality": "Morocco",
+    "x": 40,
+    "y": 70
+  },
+  {
+    "id": 5,
+    "name": "Player 5",
+    "position": "CB",
+    "number": 5,
+    "age": 23,
+    "nationality": "Argentina",
+    "x": 20,
+    "y": 70
+  }
+]
