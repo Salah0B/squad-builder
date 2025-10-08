@@ -1,8 +1,8 @@
 # Squad Builder
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+This is a React Native application for managing football team lineups with an interactive visual field. Drag players to reposition them, view detailed player information, and choose your best starting squad.
 
-## Test the app
+## Run the app
 
 1. Install dependencies
 
