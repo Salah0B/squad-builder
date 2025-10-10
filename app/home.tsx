@@ -1,3 +1,4 @@
+import { Player } from '@/types/Player';
 import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
@@ -15,46 +16,25 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const FIELD_WIDTH = SCREEN_WIDTH - 32;
 const FIELD_HEIGHT = FIELD_WIDTH * 1.5;
 
-interface Player {
-  id: number;
-  name: string;
-  position: string;
-  number: number;
-  age: number;
-  nationality: string;
-  x: number;
-  y: number;
-}
-
-export default function FootballSquad() {
+export default function Squad() {
   const [players, setPlayers] = useState<Player[]>([]);
   const [loading, setLoading] = useState(true);
-
+  const [teamId, setTeamId] = useState('33');
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
   const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
-    loadPlayers();
+    loadPlayersFromApi ();
   }, []);
 
-  const loadPlayers = async () => {
+  const loadPlayersFromApi = async () => {
     try {
       const playersData = require('./players.json');
       setPlayers(playersData);
     } catch (error) {
       console.error('Error loading players:', error);
       setPlayers([
-        { id: 1, name: 'Player 1', position: 'GK', number: 1, age: 0, nationality: 'Unknown', x: 50, y: 85 },
-        { id: 2, name: 'Player 2', position: 'RB', number: 2, age: 0, nationality: 'Unknown', x: 80, y: 70 },
-        { id: 3, name: 'Player 3', position: 'CB', number: 3, age: 0, nationality: 'Unknown', x: 0, y: 0 },
-        { id: 4, name: 'Player 4', position: 'CB', number: 4, age: 0, nationality: 'Unknown', x: 0, y: 0 },
-        { id: 5, name: 'Player 5', position: 'LB', number: 5, age: 0, nationality: 'Unknown', x: 0, y: 0 },
-        { id: 6, name: 'Player 6', position: 'CM', number: 6, age: 0, nationality: 'Unknown', x: 0, y: 0 },
-        { id: 7, name: 'Player 7', position: 'CM', number: 7, age: 0, nationality: 'Unknown', x: 0, y: 0 },
-        { id: 8, name: 'Player 8', position: 'RW', number: 8, age: 0, nationality: 'Unknown', x: 0, y: 0 },
-        { id: 9, name: 'Player 9', position: 'LW', number: 9, age: 0, nationality: 'Unknown', x: 0, y: 0 },
-        { id: 10, name: 'Player 10', position: 'ST', number: 10, age: 0, nationality: 'Unknown', x: 50, y: 15 },
-        { id: 11, name: 'Player 11', position: 'CAM', number: 11, age: 0, nationality: 'Unknown', x: 50, y: 25 }
+        { id: 1, name: 'Player 1', position: 'GK', number: 1, age: 0, nationality: 'Unknown', x: 50, y: 85 }
       ]);
     } finally {
       setLoading(false);
