@@ -15,3 +15,10 @@ This is a React Native application for managing football team lineups with an in
    ```bash
    npx expo start
    ```
+
+🌟 Features
+
+- Interactive Football Field: Customizable visual representation of a football field (not implemented)
+- Drag & Drop Players: Touch and drag any player to reposition them on the field (implemented)
+- Player Information: Tap any player to view detailed stats (implemented)
+- Player Substitutions: Substitute starting players with bench players (not implemented)
