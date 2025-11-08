@@ -1,7 +1,10 @@
+// app/home.tsx
+
 import { Player } from '@/types/Player';
 import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
+  Alert,
   Dimensions,
   Modal,
   PanResponder,
@@ -11,31 +14,53 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { mapApiPlayersToAppPlayers } from '../config/playerMapper';
+import { fetchTeamSquad } from '../services/fetchPlayers';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const FIELD_WIDTH = SCREEN_WIDTH - 32;
 const FIELD_HEIGHT = FIELD_WIDTH * 1.5;
 
-export default function Squad() {
+const DEFAULT_TEAM_ID = '33';
+
+export default function FootballSquad() {
   const [players, setPlayers] = useState<Player[]>([]);
+  const [allPlayers, setAllPlayers] = useState<Player[]>([]);
+  const [benchPlayers, setBenchPlayers] = useState<Player[]>([]);
   const [loading, setLoading] = useState(true);
-  const [teamId, setTeamId] = useState('33');
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
   const [showModal, setShowModal] = useState(false);
+  const [showSubstitutes, setShowSubstitutes] = useState(false);
+  const [teamName, setTeamName] = useState('');
 
   useEffect(() => {
-    loadPlayersFromApi ();
+    loadPlayersFromApi();
   }, []);
 
   const loadPlayersFromApi = async () => {
+    setLoading(true);
     try {
-      const playersData = require('./players.json');
-      setPlayers(playersData);
+      const data = await fetchTeamSquad(DEFAULT_TEAM_ID);
+      if (data.response && data.response.length > 0) {
+        const teamData = data.response[0];
+        setTeamName(teamData.team.name);
+        
+        const mappedPlayers = mapApiPlayersToAppPlayers(teamData.players);
+        const starters = mappedPlayers.filter(p => p.isStarter);
+        const bench = mappedPlayers.filter(p => !p.isStarter);
+        
+        setPlayers(starters);
+        setBenchPlayers(bench);
+        setAllPlayers(mappedPlayers);
+      } else {
+        Alert.alert('Error', 'No squad data found for this team');
+      }
     } catch (error) {
-      console.error('Error loading players:', error);
-      setPlayers([
-        { id: 1, name: 'Player 1', position: 'GK', number: 1, age: 0, nationality: 'Unknown', x: 50, y: 85 }
-      ]);
+      console.error('Error loading players from API:', error);
+      Alert.alert(
+        'Error',
+        'Failed to load team squad. Please check your API key and internet connection.'
+      );
     } finally {
       setLoading(false);
     }
@@ -67,67 +92,91 @@ export default function Squad() {
   const handlePlayerPress = (player: Player) => {
     setSelectedPlayer(player);
     setShowModal(true);
+    setShowSubstitutes(false);
+  };
+
+  const handleSubstitute = (benchPlayer: Player) => {
+    if (!selectedPlayer) return;
+
+    const oldPlayerX = selectedPlayer.x;
+    const oldPlayerY = selectedPlayer.y;
+
+    const updatedStarters = players.map(p => 
+      p.id === selectedPlayer.id 
+        ? { ...benchPlayer, x: oldPlayerX, y: oldPlayerY, isStarter: true }
+        : p
+    );
+
+    const updatedBench = benchPlayers
+      .filter(p => p.id !== benchPlayer.id)
+      .concat({ ...selectedPlayer, x: 0, y: 0, isStarter: false });
+
+    setPlayers(updatedStarters);
+    setBenchPlayers(updatedBench);
+    setShowModal(false);
+    setShowSubstitutes(false);
+    setSelectedPlayer(null);
   };
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Squad Builder</Text>
+        <Text style={styles.title}>Football Squad Manager</Text>
       </View>
 
       {loading ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#fff" />
-          <Text style={styles.loadingText}>Loading players...</Text>
+          <Text style={styles.loadingText}>Loading squad...</Text>
         </View>
       ) : (
         <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View style={styles.fieldContainer}>
-          <View style={[styles.field, { width: FIELD_WIDTH, height: FIELD_HEIGHT }]}>
-            {/* Field markings */}
-            <View style={styles.halfwayLine} />
-            <View style={styles.centerCircle} />
-            <View style={styles.topPenaltyBox} />
-            <View style={styles.topGoalBox} />
-            <View style={styles.bottomPenaltyBox} />
-            <View style={styles.bottomGoalBox} />
+          <View style={styles.fieldContainer}>
+            <View style={[styles.field, { width: FIELD_WIDTH, height: FIELD_HEIGHT }]}>
+              {/* Field markings */}
+              <View style={styles.halfwayLine} />
+              <View style={styles.centerCircle} />
+              <View style={styles.topPenaltyBox} />
+              <View style={styles.topGoalBox} />
+              <View style={styles.bottomPenaltyBox} />
+              <View style={styles.bottomGoalBox} />
 
-            {/* Players */}
-            {players.map(player => {
-              const panResponder = createPanResponder(player);
-              return (
-                <View
-                  key={player.id}
-                  {...panResponder.panHandlers}
-                  style={[
-                    styles.playerContainer,
-                    {
-                      left: (player.x * FIELD_WIDTH / 100) - 28,
-                      top: (player.y * FIELD_HEIGHT / 100) - 28,
-                    }
-                  ]}
-                >
-                  <TouchableOpacity
-                    onPress={() => handlePlayerPress(player)}
-                    style={styles.playerTouchable}
+              {/* Players */}
+              {players.map(player => {
+                const panResponder = createPanResponder(player);
+                return (
+                  <View
+                    key={player.id}
+                    {...panResponder.panHandlers}
+                    style={[
+                      styles.playerContainer,
+                      {
+                        left: (player.x * FIELD_WIDTH / 100) - 28,
+                        top: (player.y * FIELD_HEIGHT / 100) - 28,
+                      }
+                    ]}
                   >
-                    <View style={styles.playerCircle}>
-                      <Text style={styles.playerNumber}>{player.number}</Text>
-                    </View>
-                    <View style={styles.playerNameBadge}>
-                      <Text style={styles.playerName}>{player.name}</Text>
-                    </View>
-                  </TouchableOpacity>
-                </View>
-              );
-            })}
-          </View>
+                    <TouchableOpacity
+                      onPress={() => handlePlayerPress(player)}
+                      style={styles.playerTouchable}
+                    >
+                      <View style={styles.playerCircle}>
+                        <Text style={styles.playerNumber}>{player.number}</Text>
+                      </View>
+                      <View style={styles.playerNameBadge}>
+                        <Text style={styles.playerName}>{player.name}</Text>
+                      </View>
+                    </TouchableOpacity>
+                  </View>
+                );
+              })}
+            </View>
 
-          <Text style={styles.instruction}>
-            Drag players to reposition • Tap to view details
-          </Text>
-        </View>
-      </ScrollView>
+            <Text style={styles.instruction}>
+              Drag players to reposition • Tap to view details
+            </Text>
+          </View>
+        </ScrollView>
       )}
 
       {/* Player Info Modal */}
@@ -172,17 +221,52 @@ export default function Squad() {
                     <Text style={styles.statLabel}>Age</Text>
                     <Text style={styles.statValue}>{selectedPlayer.age} years</Text>
                   </View>
-                  <View style={styles.statRow}>
-                    <Text style={styles.statLabel}>Nationality</Text>
-                    <Text style={styles.statValue}>{selectedPlayer.nationality}</Text>
-                  </View>
                 </View>
 
                 <View style={styles.hint}>
                   <Text style={styles.hintText}>
-                    Substitute
+                    Drag the player on the field to change their position
                   </Text>
                 </View>
+
+                {!showSubstitutes ? (
+                  <TouchableOpacity
+                    style={styles.substituteButton}
+                    onPress={() => setShowSubstitutes(true)}
+                  >
+                    <Text style={styles.substituteButtonText}>🔄 Substitute Player</Text>
+                  </TouchableOpacity>
+                ) : (
+                  <View style={styles.substituteSection}>
+                    <Text style={styles.substituteSectionTitle}>Select Substitute:</Text>
+                    <ScrollView style={styles.benchList}>
+                      {benchPlayers.map(benchPlayer => (
+                        <TouchableOpacity
+                          key={benchPlayer.id}
+                          style={styles.benchPlayerCard}
+                          onPress={() => handleSubstitute(benchPlayer)}
+                        >
+                          <View style={styles.benchPlayerCircle}>
+                            <Text style={styles.benchPlayerNumber}>{benchPlayer.number}</Text>
+                          </View>
+                          <View style={styles.benchPlayerInfo}>
+                            <Text style={styles.benchPlayerName}>{benchPlayer.name}</Text>
+                            <Text style={styles.benchPlayerPosition}>
+                              {benchPlayer.position} • {benchPlayer.age} yrs
+                            </Text>
+                          </View>
+                          <Text style={styles.substituteArrow}>→</Text>
+                        </TouchableOpacity>
+                      ))}
+                    </ScrollView>
+                    <TouchableOpacity
+                      style={styles.cancelButton}
+                      onPress={() => setShowSubstitutes(false)}
+                    >
+                      <Text style={styles.cancelButtonText}>Cancel</Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
               </>
             )}
           </View>
@@ -439,5 +523,81 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     marginTop: 12,
+  },
+  substituteButton: {
+    marginTop: 16,
+    backgroundColor: '#2563eb',
+    padding: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  substituteButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  substituteSection: {
+    marginTop: 16,
+  },
+  substituteSectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#1f2937',
+    marginBottom: 12,
+  },
+  benchList: {
+    maxHeight: 200,
+  },
+  benchPlayerCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f3f4f6',
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 8,
+  },
+  benchPlayerCircle: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#6b7280',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  benchPlayerNumber: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  benchPlayerInfo: {
+    flex: 1,
+  },
+  benchPlayerName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1f2937',
+  },
+  benchPlayerPosition: {
+    fontSize: 12,
+    color: '#6b7280',
+    marginTop: 2,
+  },
+  substituteArrow: {
+    fontSize: 20,
+    color: '#2563eb',
+    fontWeight: 'bold',
+  },
+  cancelButton: {
+    marginTop: 12,
+    backgroundColor: '#e5e7eb',
+    padding: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  cancelButtonText: {
+    color: '#1f2937',
+    fontSize: 14,
+    fontWeight: '600',
   },
 });

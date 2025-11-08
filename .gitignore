@@ -1,5 +1,7 @@
 .vscode/
 .env
+android/
+config/api.config.ts
 
 # dependencies
 node_modules/
