@@ -1,4 +1,5 @@
 export const API_CONFIG = {
+  API_KEY: '',
   API_HOST: 'v3.football.api-sports.io',
   BASE_URL: 'https://v3.football.api-sports.io',
   
@@ -15,8 +16,4 @@ export const API_CONFIG = {
     BAYERN_MUNICH: '157',
     PSG: '85',
   },
-};
-
-export const getApiKey = (): string => {
-  return process.env.FOOTBALL_API_KEY || '';
 };
