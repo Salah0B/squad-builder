@@ -1,5 +1,5 @@
 export const API_CONFIG = {
-  API_KEY: '',
+  API_KEY: '', //add API KEY
   API_HOST: 'v3.football.api-sports.io',
   BASE_URL: 'https://v3.football.api-sports.io',
   
