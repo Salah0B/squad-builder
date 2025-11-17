@@ -6,6 +6,7 @@ import {
   ActivityIndicator,
   Alert,
   Dimensions,
+  Image,
   Modal,
   PanResponder,
   ScrollView,
@@ -53,7 +54,7 @@ export default function FootballSquad() {
         setBenchPlayers(bench);
         setAllPlayers(mappedPlayers);
       } else {
-        Alert.alert('Error', 'No squad data found for this team');
+        Alert.alert('Error', 'No squad data found for team ' + DEFAULT_TEAM_ID);
       }
     } catch (error) {
       console.error('Error loading players from API:', error);
@@ -121,7 +122,7 @@ export default function FootballSquad() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Football Squad Manager</Text>
+        <Text style={styles.title}>Squad Builder</Text>
       </View>
 
       {loading ? (
@@ -164,7 +165,7 @@ export default function FootballSquad() {
                         <Text style={styles.playerNumber}>{player.number}</Text>
                       </View>
                       <View style={styles.playerNameBadge}>
-                        <Text style={styles.playerName}>{player.name}</Text>
+                        <Text numberOfLines={1} ellipsizeMode="tail" style={styles.playerName}>{player.name}</Text>
                       </View>
                     </TouchableOpacity>
                   </View>
@@ -202,7 +203,10 @@ export default function FootballSquad() {
 
                 <View style={styles.playerInfoSection}>
                   <View style={styles.playerCircleLarge}>
-                    <Text style={styles.playerNumberLarge}>{selectedPlayer.number}</Text>
+                    <Image
+                      source={{ uri: selectedPlayer.photo }} 
+                      style={styles.playerImage}
+                    />
                   </View>
                   <Text style={styles.playerNameLarge}>{selectedPlayer.name}</Text>
                   <Text style={styles.playerPositionLarge}>{selectedPlayer.position}</Text>
@@ -395,6 +399,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   playerNameBadge: {
+    width: '115%',
     marginTop: 4,
     backgroundColor: 'rgba(0, 0, 0, 0.7)',
     paddingHorizontal: 8,
@@ -405,6 +410,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 10,
     fontWeight: '600',
+    textAlign: 'center',
   },
   instruction: {
     color: '#fff',
@@ -459,12 +465,17 @@ const styles = StyleSheet.create({
     backgroundColor: '#2563eb',
     justifyContent: 'center',
     alignItems: 'center',
+    overflow: 'hidden',
     marginBottom: 12,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 5,
+  },
+  playerImage: {
+    width: '100%',
+    height: '100%',
   },
   playerNumberLarge: {
     color: '#fff',
