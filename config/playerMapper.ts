@@ -53,24 +53,24 @@ export const mapApiPlayersToAppPlayers = (
 
   // Assign positions based on formation (4-3-3)
   const formationPositions = [
-    { type: 'Goalkeeper', count: 1, positions: [{ x: 50, y: 85 }] },
+    { type: 'Goalkeeper', count: 1, positions: [{ x: 50, y: 89 }] },
     { 
       type: 'Defender', 
       count: 4, 
       positions: [
-        { x: 20, y: 70 }, // LB
-        { x: 40, y: 70 }, // CB
-        { x: 60, y: 70 }, // CB
-        { x: 80, y: 70 }, // RB
+        { x: 18, y: 70 }, // LB
+        { x: 40, y: 72 }, // CB
+        { x: 60, y: 72 }, // CB
+        { x: 82, y: 70 }, // RB
       ] 
     },
     { 
       type: 'Midfielder', 
       count: 3, 
       positions: [
-        { x: 35, y: 45 }, // CM
+        { x: 30, y: 45 }, // CM
         { x: 50, y: 50 }, // CM
-        { x: 65, y: 45 }, // CM
+        { x: 70, y: 45 }, // CM
       ] 
     },
     { 

@@ -1,22 +1,20 @@
-// app/home.tsx
-
 import { Player } from '@/types/Player';
 import React, { useEffect, useState } from 'react';
 import {
-  ActivityIndicator,
-  Alert,
-  Dimensions,
-  Image,
-  Modal,
-  PanResponder,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    Alert,
+    Dimensions,
+    Image,
+    Modal,
+    PanResponder,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from 'react-native';
-import { mapApiPlayersToAppPlayers } from '../config/playerMapper';
-import { fetchTeamSquad } from '../services/fetchPlayers';
+import { mapApiPlayersToAppPlayers } from '../../config/playerMapper';
+import { fetchTeamSquad } from '../../services/fetchPlayers';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const FIELD_WIDTH = SCREEN_WIDTH - 32;
@@ -122,7 +120,7 @@ export default function FootballSquad() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Squad Builder</Text>
+        <Text style={styles.title}>My Team</Text>
       </View>
 
       {loading ? (
